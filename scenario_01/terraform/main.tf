@@ -1,7 +1,24 @@
 # ----- Keypair
+# Generate a new keypair in OpenStack and save the private and public keys locally
 resource "openstack_compute_keypair_v2" "opsathlan_keypair" {
   name       = "opsathlan-${var.scenerio_id}-keypair"
-  public_key = chomp(file(var.public_key_path))
+  public_key = openstack_compute_keypair_v2.opsathlan_keypair.public_key
+}
+
+# Save the public key to a file
+resource "local_file" "opsathlan_public_key" {
+  content  = openstack_compute_keypair_v2.opsathlan_keypair.public_key
+  filename = "${path.module}/opsathlan-${var.scenerio_id}-keypair.pub"
+}
+
+# Optionally, output the private and public keys for further use (ensure this is securely handled)
+output "private_key" {
+  value     = openstack_compute_keypair_v2.opsathlan_keypair.private_key
+  sensitive = true
+}
+
+output "public_key" {
+  value = openstack_compute_keypair_v2.opsathlan_keypair.public_key
 }
 
 # ----- Security Group 
@@ -28,11 +45,12 @@ resource "openstack_compute_instance_v2" "nova_instance" {
   name            = "opsathlan-${var.scenerio_id}-instance"
   image_name      = var.image_name
   flavor_name     = var.flavor_name
+  count           = 0
   security_groups = [openstack_networking_secgroup_v2.opsathlan_secgroup.name]
   key_pair        = openstack_compute_keypair_v2.opsathlan_keypair.name
 
   network {
-    uuid = openstack_networking_subnet_v2.internal_subnet.id
+    uuid = openstack_networking_subnet_v2.internal_subnet[count.index].id
   }
 }
 
@@ -53,6 +71,7 @@ resource "openstack_networking_network_v2" "opsathlan_network" {
 # Subnet for the internal network
 resource "openstack_networking_subnet_v2" "internal_subnet" {
   name            = "${var.scenerio_id}-internal-subnet"
+  count           = var.use_neutron == true ? 1 : 0
   network_id      = openstack_networking_network_v2.opsathlan_network[count.index].id
   cidr            = var.subnet_cidr
   ip_version      = 4

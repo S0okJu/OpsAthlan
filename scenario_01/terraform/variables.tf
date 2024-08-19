@@ -2,12 +2,7 @@
 variable "scenerio_id" {
   description = "Identifier for the scenario, used to uniquely name resources."
   type        = string
-}
-
-# ----- Keypair 
-variable "public_key_path" {
-  description = "Path to the public key file to be used for the keypair."
-  type        = string
+  default     = "01"
 }
 
 # ----- Secgroup 
@@ -55,6 +50,7 @@ variable "subnet_cidr" {
 variable "external_net" {
   description = "The external network ID to attach the router to."
   type        = string
+  default     = "public"
 }
 
 variable "use_neutron" {
