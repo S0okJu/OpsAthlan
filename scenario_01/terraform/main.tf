@@ -1,34 +1,23 @@
-# ----- Keypair
-# Generate a new keypair in OpenStack and save the private and public keys locally
+# ----- Data
+data "openstack_networking_network_v2" "ext_network" {
+  name = "public"
+}
+
+# ----- Resource
+# 1. Keypair 생성
 resource "openstack_compute_keypair_v2" "opsathlan_keypair" {
-  name       = "opsathlan-${var.scenerio_id}-keypair"
-  public_key = openstack_compute_keypair_v2.opsathlan_keypair.public_key
+  name       = "opsathlan-${var.scenario_id}-keypair"
+  public_key = file("${var.pubkey_file_path}")
 }
 
-# Save the public key to a file
-resource "local_file" "opsathlan_public_key" {
-  content  = openstack_compute_keypair_v2.opsathlan_keypair.public_key
-  filename = "${path.module}/opsathlan-${var.scenerio_id}-keypair.pub"
-}
-
-# Optionally, output the private and public keys for further use (ensure this is securely handled)
-output "private_key" {
-  value     = openstack_compute_keypair_v2.opsathlan_keypair.private_key
-  sensitive = true
-}
-
-output "public_key" {
-  value = openstack_compute_keypair_v2.opsathlan_keypair.public_key
-}
-
-# ----- Security Group 
-# Create a security group
+# 2. Security Group 생성
 resource "openstack_networking_secgroup_v2" "opsathlan_secgroup" {
-  name                 = "opsathlan-${var.scenerio_id}-secugroup"
+  name                 = "opsathlan-${var.scenario_id}-ecgroup"
+  description          = "OpsAthaln Security Group"
   delete_default_rules = true
 }
 
-# Security group rule
+# 2.1 Security Group Rule 생성
 resource "openstack_networking_secgroup_rule_v2" "secgroup_rules" {
   count             = length(var.allowed_ports)
   direction         = "ingress"
@@ -40,57 +29,54 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_rules" {
   security_group_id = openstack_networking_secgroup_v2.opsathlan_secgroup.id
 }
 
-# ----- Nova Instance
-resource "openstack_compute_instance_v2" "nova_instance" {
-  name            = "opsathlan-${var.scenerio_id}-instance"
-  image_name      = var.image_name
-  flavor_name     = var.flavor_name
-  count           = 0
-  security_groups = [openstack_networking_secgroup_v2.opsathlan_secgroup.name]
-  key_pair        = openstack_compute_keypair_v2.opsathlan_keypair.name
-
-  network {
-    uuid = openstack_networking_subnet_v2.internal_subnet[count.index].id
-  }
-}
-
-# ----- Floating IP Association
-resource "openstack_compute_floatingip_associate_v2" "floating_ip_association" {
-  floating_ip = var.floating_ip
-  instance_id = openstack_compute_instance_v2.nova_instance.id
-}
-
-# ----- Network
+# 3. Network 생성
 resource "openstack_networking_network_v2" "opsathlan_network" {
-  name                  = "opsathlan-${var.scenerio_id}-network"
-  count                 = var.use_neutron == true ? 1 : 0
+  name                  = "opsathlan-${var.scenario_id}-network"
   admin_state_up        = true
   port_security_enabled = var.port_security_enabled
 }
 
-# Subnet for the internal network
-resource "openstack_networking_subnet_v2" "internal_subnet" {
-  name            = "${var.scenerio_id}-internal-subnet"
-  count           = var.use_neutron == true ? 1 : 0
-  network_id      = openstack_networking_network_v2.opsathlan_network[count.index].id
+# 3.1 Subnet 생성
+resource "openstack_networking_subnet_v2" "opsathlan_subnet" {
+  name            = "opsathlan-${var.scenario_id}-subnet"
+  network_id      = openstack_networking_network_v2.opsathlan_network.id
   cidr            = var.subnet_cidr
   ip_version      = 4
   dns_nameservers = ["8.8.8.8", "8.8.4.4"]
 }
 
-# ----- Router
+# 3.2 Router 생성
 resource "openstack_networking_router_v2" "opsathlan_router" {
-  name                = "opsathlan-${var.scenerio_id}-router"
-  count               = var.use_neutron == true ? 1 : 0
+  name                = "opsathlan-${var.scenario_id}-router"
   admin_state_up      = true
-  external_network_id = var.external_net
+  external_network_id = data.openstack_networking_network_v2.ext_network.id
 }
 
-# Attach the router to the subnet
+# 3.3 Router Interface 생성
 resource "openstack_networking_router_interface_v2" "router_interface" {
-  count     = var.use_neutron == true ? 1 : 0
-  router_id = openstack_networking_router_v2.opsathlan_router[count.index].id
-  subnet_id = openstack_networking_subnet_v2.opsathlan_subnet[count.index].id
+  router_id = openstack_networking_router_v2.opsathlan_router.id
+  subnet_id = openstack_networking_subnet_v2.opsathlan_subnet.id
 }
 
+# 4. Nova Instance 생성
+resource "openstack_compute_instance_v2" "nova_instance" {
+  name            = "opsathlan-${var.scenario_id}-instance"
+  image_name      = var.image_name
+  flavor_name     = var.flavor_name
+  key_pair        = openstack_compute_keypair_v2.opsathlan_keypair.name
+  security_groups = [openstack_networking_secgroup_v2.opsathlan_secgroup.name]
 
+  network {
+    uuid = openstack_networking_network_v2.opsathlan_network.id
+  }
+}
+
+# 5. Floating IP 생성 및 연결
+resource "openstack_networking_floatingip_v2" "floating_ip" {
+  pool = data.openstack_networking_network_v2.ext_network.name
+}
+
+resource "openstack_compute_floatingip_associate_v2" "floating_ip_association" {
+  floating_ip = openstack_networking_floatingip_v2.floating_ip.address
+  instance_id = openstack_compute_instance_v2.nova_instance.id
+}

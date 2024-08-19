@@ -1,11 +1,32 @@
-# ----- Metadata
-variable "scenerio_id" {
+variable "scenario_id" {
   description = "Identifier for the scenario, used to uniquely name resources."
   type        = string
   default     = "01"
 }
 
-# ----- Secgroup 
+variable "image_name" {
+  description = "The name of the image to use for the instance."
+  type        = string
+  default     = "focal-server-cloudimg-amd64"
+}
+
+variable "flavor_name" {
+  description = "The flavor to use for the instance."
+  type        = string
+  default     = "m1.medium"
+}
+
+variable "subnet_cidr" {
+  description = "The CIDR block for the subnet."
+  type        = string
+}
+
+variable "port_security_enabled" {
+  description = "Enable or disable port security on the network."
+  type        = bool
+  default     = true
+}
+
 variable "allowed_ports" {
   description = "List of maps defining allowed ports for the security group. Each map should include protocol, port_range_min, port_range_max, and optionally remote_ip_prefix."
   type = list(object({
@@ -28,44 +49,7 @@ variable "allowed_ports" {
   ]
 }
 
-# ----- Nova
-variable "image_name" {
-  description = "The name of the image to use for the instance."
-  type        = string
-  default     = "focal-server-cloudimg-amd64"
-}
-
-variable "flavor_name" {
-  description = "The flavor to use for the instance."
-  type        = string
-  default     = "m1.small"
-}
-
-# ----- Network
-variable "subnet_cidr" {
-  description = "The CIDR block for the subnet."
-  type        = string
-}
-
-variable "external_net" {
-  description = "The external network ID to attach the router to."
-  type        = string
-  default     = "public"
-}
-
-variable "use_neutron" {
-  description = "Whether to create a new network and subnet or use an existing one."
-  type        = bool
-  default     = true
-}
-
-variable "port_security_enabled" {
-  description = "Enable or disable port security on the network."
-  type        = bool
-  default     = true
-}
-
-variable "floating_ip" {
-  description = "The floating IP to associate with the instance."
-  type        = string
+variable "pubkey_file_path" {
+  type    = string
+  default = "./ed.test.pub"
 }
