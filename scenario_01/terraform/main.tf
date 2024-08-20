@@ -6,7 +6,7 @@ data "openstack_networking_network_v2" "ext_network" {
 # ----- Resource
 # 1. Keypair 생성
 data "local_file" "pubkey" {
-  filename = "${path.module}/test.pub"
+  filename = var.pubkey_file_path
 }
 
 resource "openstack_compute_keypair_v2" "opsathlan_keypair" {
