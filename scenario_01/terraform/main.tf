@@ -5,16 +5,20 @@ data "openstack_networking_network_v2" "ext_network" {
 
 # ----- Resource
 # 1. Keypair 생성
+data "local_file" "pubkey" {
+  filename = "${path.module}/test.pub"
+}
+
 resource "openstack_compute_keypair_v2" "opsathlan_keypair" {
   name       = "opsathlan-${var.scenario_id}-keypair"
-  public_key = file("${var.pubkey_file_path}")
+  public_key = data.local_file.pubkey.content
 }
 
 # 2. Security Group 생성
 resource "openstack_networking_secgroup_v2" "opsathlan_secgroup" {
-  name                 = "opsathlan-${var.scenario_id}-ecgroup"
+  name                 = "opsathlan-${var.scenario_id}-secgroup"
   description          = "OpsAthaln Security Group"
-  delete_default_rules = true
+  delete_default_rules = false
 }
 
 # 2.1 Security Group Rule 생성
@@ -58,6 +62,12 @@ resource "openstack_networking_router_interface_v2" "router_interface" {
   subnet_id = openstack_networking_subnet_v2.opsathlan_subnet.id
 }
 
+
+# 5. Floating IP 생성 및 연결
+resource "openstack_networking_floatingip_v2" "floating_ip" {
+  pool = data.openstack_networking_network_v2.ext_network.name
+}
+
 # 4. Nova Instance 생성
 resource "openstack_compute_instance_v2" "nova_instance" {
   name            = "opsathlan-${var.scenario_id}-instance"
@@ -69,11 +79,9 @@ resource "openstack_compute_instance_v2" "nova_instance" {
   network {
     uuid = openstack_networking_network_v2.opsathlan_network.id
   }
-}
 
-# 5. Floating IP 생성 및 연결
-resource "openstack_networking_floatingip_v2" "floating_ip" {
-  pool = data.openstack_networking_network_v2.ext_network.name
+  depends_on = [openstack_networking_subnet_v2.opsathlan_subnet]
+
 }
 
 resource "openstack_compute_floatingip_associate_v2" "floating_ip_association" {
