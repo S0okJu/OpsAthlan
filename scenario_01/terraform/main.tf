@@ -5,13 +5,9 @@ data "openstack_networking_network_v2" "ext_network" {
 
 # ----- Resource
 # 1. Keypair 생성
-data "local_file" "pubkey" {
-  filename = var.pubkey_file_path
-}
-
 resource "openstack_compute_keypair_v2" "opsathlan_keypair" {
   name       = "opsathlan-${var.scenario_id}-keypair"
-  public_key = data.local_file.pubkey.content
+  public_key = file(var.pubkey_file_path)
 }
 
 # 2. Security Group 생성
