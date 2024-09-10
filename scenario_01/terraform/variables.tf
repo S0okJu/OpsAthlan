@@ -46,6 +46,11 @@ variable "allowed_ports" {
       protocol       = "tcp"
       port_range_min = 8080
       port_range_max = 8080
+    },
+    {
+      protocol       = "tcp"
+      port_range_min = 8081
+      port_range_max = 8081
     }
   ]
 }
