@@ -6,6 +6,10 @@
     user: "{{ ansible_user }}"
 
   tasks:
+    - name: Include Java installation playbook
+      include_role:
+        name: java-installation
+
     - name: Include Docker installation playbook
       include_role:
         name: docker-installation
