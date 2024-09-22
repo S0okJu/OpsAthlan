@@ -1,0 +1,47 @@
+---
+- name: Clone Spring Boot application repository
+  git:
+    repo: 'https://github.com/S0okJu/OpsAthlan.git'
+    dest: /home/ubuntu/app/spring-boot-app
+    version: sc/1
+
+- name: Build Spring Boot application using Gradle
+  command: ./gradlew clean build
+  args:
+    chdir: /home/ubuntu/app/spring-boot-app/scenario_01/spring_echo
+  register: gradle_build
+  failed_when: gradle_build.rc != 0
+
+- name: Check if JAR file exists
+  stat:
+    path: /home/ubuntu/app/spring-boot-app/scenario_01/spring_echo/build/libs/
+  register: jar_dir
+
+- name: Fail if JAR file does not exist
+  fail:
+    msg: "JAR file was not built successfully."
+  when: jar_dir.stat.exists == False or jar_dir.stat.isdir == False
+
+- name: Copy Dockerfile for Spring Boot
+  copy:
+    src: Dockerfile
+    dest: /home/ubuntu/app/spring-boot-app/scenario_01/spring_echo/Dockerfile
+
+
+
+- name: Build Docker image for Spring Boot application
+  docker_image:
+    name: echo-springboot-app
+    tag: latest
+    source: build
+    build:
+      path: /home/ubuntu/app/spring-boot-app/scenario_01/spring_echo
+
+
+- name: Run Spring Boot container
+  docker_container:
+    name: sc1-springboot-app
+    image: echo-springboot-app:latest
+    state: started
+    ports:
+      - "8080:8080"

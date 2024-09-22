@@ -1,0 +1,23 @@
+---
+- name: Make and execute container
+  hosts: all
+  become: yes
+  vars:
+    user: "{{ ansible_user }}"
+
+  tasks:
+    - name: Include Java installation playbook
+      include_role:
+        name: java-installation
+
+    - name: Include Docker installation playbook
+      include_role:
+        name: docker-installation
+
+    - name: Build and run spring boot container
+      include_role:
+        name: spring
+
+    - name: Build and run cAdvisor container
+      include_role:
+        name: cadvisor
