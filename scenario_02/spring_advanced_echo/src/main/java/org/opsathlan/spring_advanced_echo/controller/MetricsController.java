@@ -18,10 +18,8 @@ public class MetricsController {
     // Custom /metrics endpoint for Prometheus to scrape
     @GetMapping("/metrics")
     public ResponseEntity<String> metrics() {
-        // Expose all metrics in the Prometheus scrape format with proper content type
         String scrape = prometheusMeterRegistry.scrape();
 
-        // Return the metrics with the correct content type "text/plain"
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
 
