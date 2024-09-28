@@ -67,5 +67,5 @@ variable "allowed_ports" {
 
 variable "pubkey_file_path" {
   type    = string
-  default = "~/.ssh/instance1.pub"
+  default = "~/.ssh/test.pub"
 }
