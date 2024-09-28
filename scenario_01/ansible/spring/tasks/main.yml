@@ -3,7 +3,7 @@
   git:
     repo: 'https://github.com/S0okJu/OpsAthlan.git'
     dest: /home/ubuntu/app/spring-boot-app
-    version: sc/1
+    version: main
 
 - name: Build Spring Boot application using Gradle
   command: ./gradlew clean build
@@ -31,17 +31,16 @@
 
 - name: Build Docker image for Spring Boot application
   docker_image:
-    name: echo-springboot-app
+    name: opsathlan-advanced-echo
     tag: latest
     source: build
     build:
       path: /home/ubuntu/app/spring-boot-app/scenario_01/spring_echo
 
-
-- name: Run Spring Boot container
+- name: Docker-compose up
   docker_container:
-    name: sc1-springboot-app
-    image: echo-springboot-app:latest
+    name: opsathlan-advanced-echo
+    image: opsathlan-advanced-echo:latest
     state: started
     ports:
       - "8080:8080"
