@@ -1,0 +1,6 @@
+---
+- name: Run docker-compose up to start containers
+  command: docker compose up -d
+  args:
+    chdir: /home/ubuntu/
+  become: true

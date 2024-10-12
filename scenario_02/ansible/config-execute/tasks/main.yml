@@ -1,0 +1,12 @@
+---
+# tasks file for config-execute
+
+- name: Include build tasks
+  include_tasks: build.yml
+
+- name: Include config tasks
+  include_tasks: config.yml
+
+- name: Include execution tasks
+  include_tasks: execution.yml
+
