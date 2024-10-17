@@ -1,5 +1,5 @@
 module "network" {
-  source = "./modules/network"
+  source = "../modules/network"
 
   ext_network_name      = var.ext_network_name
   port_security_enabled = var.port_security_enabled
@@ -8,16 +8,16 @@ module "network" {
 }
 
 module "compute" {
-  source = "./modules/compute"
+  source = "../modules/compute"
 
 
   allowed_ports     = var.allowed_ports
   flavor            = var.flavor
-  floating_ip       = var.floating_ip
   image             = var.image
   network_network   = module.network.network_id
   network_router_id = module.network.router_id
   project_name      = var.project_name
   pubkey_file_path  = var.pubkey_file_path
   ssh_user          = var.ssh_user
+  floating_ip       = module.network.floating_ip
 }

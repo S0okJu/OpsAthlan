@@ -31,7 +31,7 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_rules" {
 
 resource "openstack_networking_port_v2" "networking_port" {
   name = "${var.project_name}-port"
-  network_id = var.network_network.id
+  network_id = var.network_network
 
   depends_on = [
     var.network_router_id

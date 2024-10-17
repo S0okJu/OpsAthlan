@@ -9,3 +9,7 @@ output "subnet_id" {
 output "router_id" {
   value = openstack_networking_router_v2.network_router.id
 }
+
+output "floating_ip" {
+  value = openstack_networking_floatingip_v2.floating_ip
+}
