@@ -12,9 +12,11 @@
 - Ansible
 
 # 관련 프로젝트 
-- [GoNetWorker](https://github.com/S0okJu/GoNetWorker) : 운영 환경을 학습하기 위한 네트워크 시뮬레이션 도구
+- [GoNetWorker](https://github.com/S0okJu/GoNetWorker): 운영 환경을 학습하기 위한 네트워크 시뮬레이션 도구
 
 # 시나리오(예정)
+### 3. 데이터베이스를 배포해보자!
+- 진행중 🏃🏻...
 
 # 시나리오(완료)
  
@@ -41,7 +43,6 @@
 #### 구성도
 ![](./imgs/arch/2.png)
 
-  
-### 3. 데이터베이스를 배포해보자!
-- 진행중 🏃🏻...
 
+# 추후 계획
+- 시나리오가 5개이상이 되면 시나리오 설명을 github docs로 옮길 예정입니다.
