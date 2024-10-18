@@ -1,0 +1,73 @@
+---
+# Check if Java is installed
+- name: Check if Java is installed
+  command: java -version
+  ignore_errors: yes
+  register: java_check
+
+- name: Print message if Java is not installed
+  debug:
+    msg: "Java is not installed."
+  when: java_check.failed
+
+# Check if Docker is installed
+- name: Check if Docker is installed
+  command: docker --version
+  ignore_errors: yes
+  register: docker_check
+
+- name: Print message if Docker is not installed
+  debug:
+    msg: "Docker is not installed."
+  when: docker_check.failed
+
+# Check if Docker Compose is installed
+- name: Check if Docker Compose is installed
+  command: docker compose version
+  ignore_errors: yes
+  register: docker_compose_check
+
+- name: Print message if Docker Compose is not installed
+  debug:
+    msg: "Docker Compose is not installed."
+  when: docker_compose_check.failed
+
+# Clone Spring Boot application repository
+- name: Clone Spring Boot application repository
+  git:
+    repo: 'https://github.com/S0okJu/OpsAthlan.git'
+    dest: /home/ubuntu/app/spring-boot-app
+    version: sc/2
+    force: yes
+
+# Dockerfile
+- name: Copy Dockerfile for Spring Boot
+  copy:
+    src: Dockerfile
+    dest: /home/ubuntu/app/spring-boot-app/scenario_02/spring_advanced_echo/Dockerfile
+
+# Prometheus
+- name: Create Prometheus configuration directory
+  file:
+    path: "/home/ubuntu/prometheus"
+    state: directory
+    owner: "ubuntu"
+    group: "ubuntu"
+    mode: '0755'
+
+- name: Copy Prometheus config file
+  copy:
+    src: ./prometheus.yml
+    dest: /home/ubuntu/prometheus/prometheus.yml
+    owner: "ubuntu"
+    group: "ubuntu"
+    mode: '0644'
+
+# Docker-compose
+- name: Copy docker-compose.yml to the target machine
+  copy:
+    src: ./docker-compose.yml
+    dest: /home/ubuntu/docker-compose.yml
+    owner: "ubuntu"
+    group: "ubuntu"
+    mode: '0644'
