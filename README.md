@@ -11,7 +11,12 @@
 - Teraform
 - Ansible
 
-# 시나리오
+# 관련 프로젝트 
+- [GoNetWorker](https://github.com/S0okJu/GoNetWorker) : 운영 환경을 학습하기 위한 네트워크 시뮬레이션 도구
+
+# 시나리오(예정)
+
+# 시나리오(완료)
  
 > [!IMPORTANT] 
 > 초기에 시나리오만 정하고 수행 과정에서 발생하는 문제와 의문점을 해결하는 방식입니다.
@@ -24,9 +29,6 @@
 - SpringBoot
 - cAdvisor
 
-#### 사용 리소스
-- Nova
-
 #### 구성도
 ![](./imgs/arch/1.png)
 
@@ -35,9 +37,6 @@
 - Docker
 - Spring Boot
 - Prometheus & Grafana
-
-#### 사용 리소스
-- Nova
 
 #### 구성도
 ![](./imgs/arch/2.png)
