@@ -79,6 +79,7 @@
     owner: root
     group: docker
     mode: "0660"
+
 # ----- Verify docker
 - name: Verify Docker installation
   command: docker --version

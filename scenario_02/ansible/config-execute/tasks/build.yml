@@ -1,0 +1,27 @@
+---
+# Build spring boot application
+- name: Build Spring Boot application using Gradle
+  command: ./gradlew clean build
+  args:
+    chdir: /home/ubuntu/app/spring-boot-app/scenario_02/spring_advanced_echo
+  register: gradle_build
+  failed_when: gradle_build.rc != 0
+
+- name: Check if JAR file exists
+  stat:
+    path: /home/ubuntu/app/spring-boot-app/scenario_02/spring_advanced_echo/build/libs/
+  register: jar_dir
+
+- name: Fail if JAR file does not exist
+  fail:
+    msg: "JAR file was not built successfully."
+  when: jar_dir.stat.exists == False or jar_dir.stat.isdir == False
+
+# Build Docker image for Spring Boot application
+- name: Build Docker image for Spring Boot application
+  docker_image:
+    name: opsathlan-advanced-echo
+    tag: latest
+    source: build
+    build:
+      path: /home/ubuntu/app/spring-boot-app/scenario_02/spring_advanced_echo
