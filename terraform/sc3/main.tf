@@ -20,5 +20,8 @@ module "compute" {
   pubkey_file_path  = var.pubkey_file_path
   ssh_user          = var.ssh_user
   floating_ip       = module.network.floating_ip
+  nova_with_volume_count = var.nova_with_volume_count
+  instance_with_volume_allowed = var.instance_with_volume_allowed
+  nova_volume_name = "article-nova-volume"
 
 }
