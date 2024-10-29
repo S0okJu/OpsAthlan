@@ -1,0 +1,6 @@
+---
+# defaults file for mysql_server
+mysql_root_password: "password"
+mysql_version: "5.7"
+mysql_data_directory: "/mnt/mysql_data"
+mysql_bind_address: "0.0.0.0"
