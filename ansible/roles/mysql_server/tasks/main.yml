@@ -1,3 +1,0 @@
----
-- import_tasks: partition.yml
-- import_tasks: configure_mysql.yml

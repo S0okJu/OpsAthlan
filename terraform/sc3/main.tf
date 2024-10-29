@@ -98,12 +98,22 @@ resource "openstack_networking_port_v2" "db_port" {
 
 # 7. Floating IP for Web Instance
 resource "openstack_networking_floatingip_v2" "web_floating_ip" {
-  pool = "public"
+  pool = "public"  # Replace with the actual name of your floating IP pool if different
 }
 
 resource "openstack_networking_floatingip_associate_v2" "web_floating_ip_association" {
   floating_ip = openstack_networking_floatingip_v2.web_floating_ip.address
   port_id     = openstack_networking_port_v2.web_port.id
+}
+
+# Floating IP for MySQL (DB) Instance
+resource "openstack_networking_floatingip_v2" "db_floating_ip" {
+  pool = "public"  # Replace with the actual name of your floating IP pool if different
+}
+
+resource "openstack_networking_floatingip_associate_v2" "db_floating_ip_association" {
+  floating_ip = openstack_networking_floatingip_v2.db_floating_ip.address
+  port_id     = openstack_networking_port_v2.db_port.id
 }
 
 # 8. Single Nova Instance (Web Server)
