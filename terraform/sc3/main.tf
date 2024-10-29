@@ -36,12 +36,12 @@ resource "openstack_networking_secgroup_v2" "web_secgroup" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "web_secgroup_rules" {
-  count             = 2
+  count             = 6
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
-  port_range_min    = element([22, 8080], count.index)
-  port_range_max    = element([22, 8080], count.index)
+  port_range_min    = element([22, 80, 443, 8080, 18080, 50000], count.index)
+  port_range_max    = element([22, 80, 443, 8080, 18080, 50000], count.index)
   remote_ip_prefix  = "0.0.0.0/0"
   security_group_id = openstack_networking_secgroup_v2.web_secgroup.id
 }
@@ -49,7 +49,7 @@ resource "openstack_networking_secgroup_rule_v2" "web_secgroup_rules" {
 # 3. Security Group for MySQL Nova Instance
 resource "openstack_networking_secgroup_v2" "db_secgroup" {
   name        = "${var.project_name}-db-secgroup"
-  description = "Allow SSH and MySQL traffic"
+  description = "Allow SSH and MySQL traffic!"
 }
 
 resource "openstack_networking_secgroup_rule_v2" "db_secgroup_rules" {

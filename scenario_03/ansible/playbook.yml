@@ -1,0 +1,11 @@
+---
+- name: Make and execute container
+  hosts: all
+  become: yes
+  vars:
+    user: "{{ ansible_user }}"
+
+  tasks:
+    - name: Configuration and Execution
+      include_role:
+        name: config-execute
