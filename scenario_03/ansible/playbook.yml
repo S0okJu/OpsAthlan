@@ -6,6 +6,9 @@
     user: "{{ ansible_user }}"
 
   tasks:
-    - name: Configuration and Execution
+    - name: Docker installation
       include_role:
-        name: config-execute
+        name: docker-installation
+    - name: java installation
+      include_role:
+        name : java-installation

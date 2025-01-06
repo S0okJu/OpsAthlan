@@ -26,6 +26,8 @@
     name:
       - ca-certificates
       - curl
+      - apt-transport-https
+      - software-properties-common
     state: present
 
 - name: Create /etc/apt/keyrings directory
