@@ -1,0 +1,14 @@
+---
+- name: Make and execute container
+  hosts: all
+  become: yes
+  vars:
+    user: "{{ ansible_user }}"
+
+  tasks:
+    - name: Docker installation
+      include_role:
+        name: docker-installation
+    - name: java installation
+      include_role:
+        name : java-installation

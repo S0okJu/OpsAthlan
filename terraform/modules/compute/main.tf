@@ -40,6 +40,7 @@ resource "openstack_networking_port_v2" "networking_port" {
 
 resource "openstack_compute_instance_v2" "nova_instance" {
   name            = "${var.project_name}-instance"
+  count = var.nova_count
   image_name      = var.image
   flavor_name     = var.flavor
   key_pair        = openstack_compute_keypair_v2.instance_keypair.name
@@ -53,6 +54,57 @@ resource "openstack_compute_instance_v2" "nova_instance" {
       ssh_user = var.ssh_user
       depends_on = var.network_router_id
     }
+}
+
+# Nova with Block Storage
+# 2. Security Group
+resource "openstack_networking_secgroup_v2" "instance_with_volume_secgroup" {
+  name                 = "${var.project_name}-with-volume-secgroup"
+  description          = "${var.project_name} Security Group"
+  delete_default_rules = false
+}
+
+# 2.1 Security Group Rule 생성
+resource "openstack_networking_secgroup_rule_v2" "instance_with_volume_secgroup_rules" {
+  count             = length(var.instance_with_volume_allowed)
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = lookup(var.allowed_ports[count.index], "protocol", "tcp")
+  port_range_min    = lookup(var.allowed_ports[count.index], "port_range_min")
+  port_range_max    = lookup(var.allowed_ports[count.index], "port_range_max")
+  remote_ip_prefix  = lookup(var.allowed_ports[count.index], "remote_ip_prefix", "0.0.0.0/0")
+  security_group_id = openstack_networking_secgroup_v2.instance_with_volume_secgroup.id
+}
+
+
+
+
+resource "openstack_blockstorage_volume_v3" "nova-volume" {
+  name = var.nova_volume_name
+  size = 1
+}
+
+resource "openstack_compute_instance_v2" "nova-instance-with-volume" {
+  name            = "${var.project_name}-instance-with-volume"
+  count = var.nova_with_volume_count
+  image_name      = var.image
+  flavor_name     = var.flavor
+  key_pair        = openstack_compute_keypair_v2.instance_keypair.name
+  security_groups = [openstack_networking_secgroup_v2.instance_with_volume_secgroup.name]
+
+  network {
+    port = openstack_networking_port_v2.networking_port.id
+  }
+
+  metadata = {
+    ssh_user = var.ssh_user
+    depends_on = var.network_router_id
+  }
+}
+
+resource "openstack_compute_volume_attach_v2" "attached" {
+  instance_id = openstack_compute_instance_v2.nova-instance-with-volume.id
+  volume_id   = openstack_blockstorage_volume_v3.nova-volume.id
 }
 
 resource "openstack_compute_floatingip_associate_v2" "floating_ip_association" {

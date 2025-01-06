@@ -20,4 +20,5 @@ module "compute" {
   pubkey_file_path  = var.pubkey_file_path
   ssh_user          = var.ssh_user
   floating_ip       = module.network.floating_ip
+
 }
