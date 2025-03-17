@@ -13,6 +13,7 @@
 
 ## 관련 프로젝트 
 - [GoNetWorker](https://github.com/S0okJu/GoNetWorker): 운영 환경을 학습하기 위한 네트워크 시뮬레이션 도구
+- [OpsAthlan apps](https://github.com/S0okJu/OpsAthlan-apps): 시나리오 수행시 필요한 웹 애플리케이션 모음
 
 ## 시나리오(예정)
 ### 3. 데이터베이스를 배포해보자!
